@@ -6,6 +6,8 @@ This repository contains a solution for the Kaggle "Digit Recognizer" competitio
 
 ![ViT Architecture](media/ViT.png)
 
+_Figure 1. ViT model overview_ [1]
+
 The core of this project is the Vision Transformer, a model that applies the transformer architecture, originally designed for natural language processing, to computer vision tasks.
 
 ### Key Concepts:
@@ -72,9 +74,16 @@ Here is a plot of the training and validation loss:
 
 ![Training and Validation Loss](media/0_4e-4_0.3.png)
 
+_Figure 2. Training and validation loss; weight decay = 0, learning rate = 4e-4, dropout rate = 0.3_
+
 ### Public Score & Leaderboard
 
 #### Public Score: 0.96150
 #### Leaderboard (Aug 2025): 969
 
 ![Kaggle Leaderboard](media/kaggle_result.png)
+
+_Figure 3. Kaggle submission result_
+
+## References
+1. Dosovitskiy, Alexey, et al. "An image is worth 16x16 words: Transformers for image recognition at scale." arXiv preprint _arXiv:2010.11929 (2020)._

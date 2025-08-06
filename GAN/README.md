@@ -50,6 +50,6 @@ The training process is documented in the `GAN.ipynb` notebook. It involves:
 -   Training the models adversarially.
 -   Visualizing the generated images at the end of training.
 
-# References
+## References
 1. Dan, Yabo, et al. "Generative adversarial networks (GAN) based efficient sampling of chemical composition space for inverse design of inorganic materials." _npj Computational Materials 6.1 (2020): 84._
 2. Goodfellow, Ian J., et al. "Generative adversarial nets." _Advances in neural information processing systems 27 (2014)._
