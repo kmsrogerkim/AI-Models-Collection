@@ -6,6 +6,8 @@ This repository contains a simple Generative Adversarial Network (GAN) implement
 
 ![GAN Architecture](media/GAN.png)
 
+_Figure 1. Architecture of GAN [1]_
+
 A GAN consists of two neural networks, a Generator and a Discriminator, that are trained simultaneously in a zero-sum game.
 
 ### Key Concepts:
@@ -47,3 +49,7 @@ The training process is documented in the `GAN.ipynb` notebook. It involves:
 -   Defining the Generator and Discriminator networks.
 -   Training the models adversarially.
 -   Visualizing the generated images at the end of training.
+
+# References
+1. Dan, Yabo, et al. "Generative adversarial networks (GAN) based efficient sampling of chemical composition space for inverse design of inorganic materials." _npj Computational Materials 6.1 (2020): 84._
+2. Goodfellow, Ian J., et al. "Generative adversarial nets." _Advances in neural information processing systems 27 (2014)._
