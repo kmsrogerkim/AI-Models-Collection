@@ -1,17 +1,49 @@
-# GAN Model
+# Generative Adversarial Network (GAN) for MNIST
 
-## 🛠️ Description
+This repository contains a simple Generative Adversarial Network (GAN) implemented in PyTorch to generate handwritten digits from the MNIST dataset.
 
-This python code builds, tests the GAN(Generative Adversarial Network) model using pytorch as a part of the HYU's HAI Club activity.
+## Generative Adversarial Network (GAN)
 
-## ⚙️ Languages or Frameworks Used
+![GAN Architecture](media/GAN.png)
 
-- torch
-- torchvision
-- matplotlib
+A GAN consists of two neural networks, a Generator and a Discriminator, that are trained simultaneously in a zero-sum game.
 
-<!-- ## 🌟 How to run -->
+### Key Concepts:
 
-## 🤖 Contributors
+-   **Generator:** Takes a random noise vector as input and attempts to generate a realistic image (in this case, a handwritten digit). Its goal is to produce images that can fool the Discriminator.
+-   **Discriminator:** Takes both real images from the dataset and fake images from the Generator as input. Its goal is to distinguish between the real and fake images.
+-   **Adversarial Training:** The Generator and Discriminator are trained in opposition. The Generator gets better at creating convincing images, while the Discriminator gets better at detecting them. This process drives the Generator to produce increasingly realistic images.
 
-[RogerKimJazzLover]((https://github.com/RogerKimJazzLover)https://github.com/RogerKimJazzLover)
+## Requirements
+
+This project uses [Poetry](https://python-poetry.org/) for dependency management. The main dependencies are:
+
+-   `torch`
+-   `torchvision`
+-   `matplotlib`
+-   `tqdm`
+
+## Usage
+
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/your-username/GAN-MNIST.git
+    cd GAN-MNIST
+    ```
+2.  **Install dependencies:**
+    ```bash
+    poetry install
+    ```
+3.  **Run the Jupyter notebook**
+    The `GAN.ipynb` notebook contains the complete code for building, training, and visualizing the GAN.
+
+## Result
+
+### Training
+
+The training process is documented in the `GAN.ipynb` notebook. It involves:
+
+-   Loading the MNIST training data.
+-   Defining the Generator and Discriminator networks.
+-   Training the models adversarially.
+-   Visualizing the generated images at the end of training.
