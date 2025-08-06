@@ -9,6 +9,9 @@ __pycache__/
 # Datas
 GAN/data/*
 
+# Weights
+GAN/*.pt
+
 # Distribution / packaging
 .Python
 build/
