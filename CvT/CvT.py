@@ -20,6 +20,8 @@ class ConvTokenEmbedding(nn.Module):
             cls = self.cls_token.expand(x.size(0), -1, -1).to(device=x.device, dtype=x.dtype)
             x = torch.cat([x, cls], dim=1)
         x = self.layer_norm(x)
+        # "flattened into size Hi*Wi × Ci and normalized by layer normalization
+        # for input into the subsequent Transformer blocks of stage i" (p. 4).
         return x
 
 class ConvTransformerBlock(nn.Module):
@@ -51,22 +53,17 @@ class ConvTransformerBlock(nn.Module):
         def flatten(t: torch.Tensor) -> torch.Tensor:
             return t.flatten(2).transpose(1, 2)
 
-        # pre-norm
-        B, D, H, W = x.shape
-        x = flatten(x)
-        if cls_token is not None:
-            x = torch.cat([cls_token, x], dim=1)
-        x = self.pre_norm(x)
-        if cls_token is not None:
-            cls_token, x = x[:, :1, :], x[:, 1:, :]
-        x = x.reshape(B, D, H, W)
+        if x.dim() == 3:
+            batch_size, n, d = x.shape
+            h = int(n**0.5)
+            x = x.reshape(batch_size, d, h, h) # [B, D, H, W]
 
         # Convolutional projections (spatial tokens only, no cls token)
         q = self.q_dw_separable_conv_layer(x)        # [B, D, Hq, Wq]
         k = self.k_dw_separable_conv_layer(x)        # [B, D, Hk, Wk]
         v = self.v_dw_separable_conv_layer(x)        # [B, D, Hk, Wk]
 
-        B, D, Hq, Wq = q.shape
+        B, D, H, W = q.shape
 
         q = flatten(q)
         k = flatten(k)
@@ -80,13 +77,13 @@ class ConvTransformerBlock(nn.Module):
             k = torch.cat([cls_token, k], dim=1)
             v = torch.cat([cls_token, v], dim=1)
         x = x + self.multi_head_attention(q, k, v)[0]
-        x = x + self.mlp(self.layer_norm(x))
+        x = x + self.mlp(self.layer_norm(x))    # [B, 1+N, D]
 
         if cls_token is not None:
             cls_token = x[:, :1, :]
             x = x[:, 1:, :]
 
-        x = x.transpose(1, 2).reshape(B, D, Hq, Wq)
+        x = x.transpose(1, 2).reshape(B, D, H, W)
         return x, cls_token
 
     def make_depth_wise_sperable_conv(self, in_ch, out_ch, k, s):
@@ -157,18 +154,11 @@ class CvT(nn.Module):
 
     def forward(self, x: torch.Tensor):
         z1 = self.embed1(x)      # [B, N, D]
-        # "flattened into size Hi*Wi × Ci and normalized by layer normalization [1] 
-        # for input into the subsequent Transformer blocks of stage i" (p. 4).
-        batch_size, n, c = z1.shape
-        h = int(n**0.5)
-        z1 = z1.reshape(batch_size, c, h, -1) # [B, D, H, W]
+
         for blk in self.blocks1:
-            z1 = blk(z1)[0]         # shape stays 
+            z1 = blk(z1)[0]
 
         z2 = self.embed2(z1)
-        batch_size, n, c = z2.shape
-        h = int(n**0.5)
-        z2 = z2.reshape(batch_size, c, h, -1)
         for blk in self.blocks2:
             z2 = blk(z2)[0]
 
@@ -178,10 +168,6 @@ class CvT(nn.Module):
         z3 = self.embed3(z2)
         cls, z3 = z3[:, :1, :], z3[:, 1:, :]  # split cls token from spatial patch
 
-        # reshape patch
-        batch_size, n, c = z3.shape
-        h = int(n**0.5)
-        z3 = z3.reshape(batch_size, c, h, -1)
         for blk in self.blocks3:
             z3, cls = blk(z3, cls)
             # z3: [B, C3, H, W]
