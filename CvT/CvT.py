@@ -1,6 +1,32 @@
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
+
+class MultiHeadAttention(nn.Module):
+    def __init__(self, dim, num_heads, attn_drop=0.0, proj_drop=0.0):
+        super().__init__()
+        assert dim % num_heads == 0
+        self.num_heads = num_heads
+        self.head_dim = dim // num_heads
+        self.scale = self.head_dim ** -0.5
+        self.out_proj = nn.Linear(dim, dim, bias=True)  # W_o
+        self.attn_drop = nn.Dropout(attn_drop)
+        self.proj_drop = nn.Dropout(proj_drop)
+
+    def forward(self, q, k, v):  # [B,N,D] each
+        B, Nq, D = q.shape
+        h, d = self.num_heads, self.head_dim
+        q = q.view(B, Nq, h, d).transpose(1, 2)
+        k = k.view(B, -1, h, d).transpose(1, 2)
+        v = v.view(B, -1, h, d).transpose(1, 2)
+
+        attn = (q @ k.transpose(-2, -1)) * self.scale
+        attn = self.attn_drop(attn.softmax(dim=-1))
+        out = attn @ v                             # [B,h,Nq,d]
+        out = out.transpose(1, 2).reshape(B, Nq, D)
+        out = self.out_proj(out)                   # output projection
+        out = self.proj_drop(out)                  # <- proj_drop lives here
+        return out
+
 
 class ConvTokenEmbedding(nn.Module):
     def __init__(self, in_ch, out_ch, k, s, add_cls_token = False):
@@ -41,7 +67,8 @@ class ConvTransformerBlock(nn.Module):
         self.k_dw_separable_conv_layer = self.make_depth_wise_sperable_conv(in_ch, dim, k, s)
         self.v_dw_separable_conv_layer = self.make_depth_wise_sperable_conv(in_ch, dim, k, s)
 
-        self.multi_head_attention = nn.MultiheadAttention(dim, num_heads, dropout=attn_drop, batch_first=True)
+        # self.multi_head_attention = nn.MultiheadAttention(dim, num_heads, dropout=attn_drop, batch_first=True)
+        self.multi_head_attention = MultiHeadAttention(dim, num_heads, attn_drop=attn_drop, proj_drop=proj_drop)
 
         self.mlp = self.make_mlp()
 
