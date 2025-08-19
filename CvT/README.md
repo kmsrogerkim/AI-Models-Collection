@@ -44,15 +44,15 @@ Then, you can run the `train.ipynb` notebook to train the model.
 
 ## Results
 
-The learning curve for the model is shown below:
+The learning curve for the CvT-13 model is shown below:
 
 <p align="center">
-  <img src="./media/learning_curve.png" width="600"/>
+  <img src="./media/CvT-13-Learning-Curve.png" width="100%"/>
 </p>
 
 ## Issues
 
-You can see the learning curve isn't in its most desirable shape. The paper first trains the model on HUGE datasets, then transfer it to smaller datasets, like the Oxford Pet dataset. However, I had to train this on my 6GB VRAM NVIDIA GPU, making that impossible. As a result, overfitting was un-avoidable. 
+You can see the learning curve isn't in its most desirable shape. The paper first trains the model on HUGE datasets, then transfer it to smaller datasets, like the Oxford Pet dataset. However, I had to train this on my 6GB VRAM NVIDIA GPU, making that impossible. As a result, overfitting was un-avoidable. And loss didn't go down below 3.0.
 
 ## References
 
